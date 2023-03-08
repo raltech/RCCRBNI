@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 '''
 Score func calculates how well the produced dictionary is
@@ -12,8 +13,34 @@ def span_score_func(vectors):
     return span
 
 def cosine_sim_score_func(vectors):
-    # calculate the cosine similarity of a set of vectors
-    # :param vectors: list of vectors
-    # :return: cosine similarity of vectors
-    sim = np.dot(vectors, vectors.T)
-    return sim
+    score = 0.0
+    _, dim = vectors.shape
+    # calculate the magnitude of each vector
+    mag = np.linalg.norm(vectors, axis=1)
+
+    # calculate the cosine similarity between each vector and unit vector
+    for d in range(dim):
+        unit_vec = np.zeros(dim)
+        unit_vec[d] = 1
+        cos_sim = np.dot(vectors, unit_vec) / mag
+        score += np.max(cos_sim)
+
+    return score
+
+def mag_cosine_sim_score_func(vectors):
+    score = 0.0
+    _, dim = vectors.shape
+    # calculate the magnitude of each vector
+    mag = np.linalg.norm(vectors, axis=1)
+
+    # calculate the magnitude difference between each vector and unit vector
+    abs_mag_diff = np.abs(mag - 1)
+
+    # calculate the cosine similarity between each vector and unit vector
+    for d in range(dim):
+        unit_vec = np.zeros(dim)
+        unit_vec[d] = 1
+        cos_sim = np.dot(vectors, unit_vec) / mag
+        score += np.max(cos_sim)*(1/np.exp(abs_mag_diff[np.argmax(cos_sim)]))
+
+    return score
