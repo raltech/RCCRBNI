@@ -1,0 +1,9 @@
+# data
+data/*
+
+# scratch
+test.ipynb
+
+# misc
+.vscode
+__pycache__
