@@ -3,7 +3,7 @@ from env import SimulationEnv, FullStateSimulationEnv
 from utils.reward_func import inverse_reward_func
 from utils.score_func import span_score_func, mag_cosine_sim_score_func, cosine_sim_score_func
 from utils.helper import display_non_zero, get_dict_from_action_idx, load_dictionary
-from agent import EpsilonGreedyAgent, StatelessEpsilonGreedyAgent
+from agent import EpsilonGreedyAgent, StatelessEpsilonGreedyAgent, StatelessExpDecayEpsilonGreedyAgent, StatelessTSAgend
 
 def main():
     experiments = ["2022-11-04-2", "2022-11-28-1"]
@@ -11,7 +11,8 @@ def main():
 
     sim = FullStateSimulationEnv(path, reward_func=inverse_reward_func, score_func=span_score_func, n_maxstep=15000000, n_elecs=512, n_amps=42)
 
-    agent = StatelessEpsilonGreedyAgent(sim, epsilon=0.5, gamma=0.9, alpha=0.1)
+    # agent = StatelessEpsilonGreedyAgent(sim, gamma=0.9, epsilon=0.5)
+    agent = StatelessTSAgend(sim, gamma=0.9)
     agent.run(n_episodes=10000)
 
     display_non_zero(agent.Q.reshape(-1,1), top_k=10)
