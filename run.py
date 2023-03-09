@@ -1,25 +1,26 @@
 import numpy as np
-from env import SimulationEnv, FullStateSimulationEnv
+from env.single_state_env import SingleStateEnvironment
 from utils.reward_func import inverse_reward_func
 from utils.score_func import span_score_func, mag_cosine_sim_score_func, cosine_sim_score_func
-from utils.helper import display_non_zero, get_dict_from_action_idx, load_dictionary
-from agent import EpsilonGreedyAgent, StatelessEpsilonGreedyAgent, StatelessExpDecayEpsilonGreedyAgent, StatelessTSAgend
+from utils.helper import display_non_zero, get_dict_from_action_idx, load_dictionary, action2elec_amp
+# from agent import EpsilonGreedyAgent, StatelessEpsilonGreedyAgent, StatelessExpDecayEpsilonGreedyAgent, StatelessTSAgend
+from agent.epsilon_greedy import EpsilonGreedyAgent
 
 def main():
     experiments = ["2022-11-04-2", "2022-11-28-1"]
     path = f"./data/{experiments[0]}/dictionary"
 
-    sim = FullStateSimulationEnv(path, reward_func=inverse_reward_func, score_func=span_score_func, n_maxstep=15000000, n_elecs=512, n_amps=42)
+    env = SingleStateEnvironment(path, reward_func=inverse_reward_func, score_func=span_score_func, n_maxstep=15000000, n_elecs=512, n_amps=42)
+    agent = EpsilonGreedyAgent(env, gamma=0.8, epsilon=0.9, decay_rate=1-10e-7)
+    agent.run(n_episodes=50000)
 
-    # agent = StatelessEpsilonGreedyAgent(sim, gamma=0.9, epsilon=0.5)
-    agent = StatelessTSAgend(sim, gamma=0.9)
-    agent.run(n_episodes=10000)
-
-    display_non_zero(agent.Q.reshape(-1,1), top_k=10)
+    display_non_zero(agent.Q, top_k=10)
 
     new_dict = []
-    for a in np.nonzero(agent.Q)[0]:
-        new_dict.append(get_dict_from_action_idx(a, sim.n_amps, path))
+    # choose state
+    state = 0
+    for a in np.nonzero(agent.Q[state])[0]:
+        new_dict.append(get_dict_from_action_idx(a, env.n_amps, path))
     new_dict = np.array(new_dict)
 
     dict = load_dictionary(path)[0]

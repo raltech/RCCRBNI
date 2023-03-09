@@ -200,12 +200,12 @@ class StatelessTSAgend:
         return self.action
     
     def get_action(self):
-        prob_dist = np.copy(self.Q) + 1.0
-        Q_sum =np.sum(prob_dist)
-        if Q_sum == 0:
+        prob_dist = np.log(np.copy(self.Q) + 5.0)
+        prob_dist_sum =np.sum(prob_dist)
+        if prob_dist_sum == 0:
             action_idx = np.random.randint(0, self.env.n_elecs*self.env.n_amps)
         else:   
-            prob_dist=prob_dist/Q_sum
+            prob_dist=prob_dist/prob_dist_sum
             action_idx = np.random.choice(len(self.Q), size=1, p=prob_dist)
         return action_idx
 
