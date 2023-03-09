@@ -1,7 +1,8 @@
 # Rapid Calibration of a Cellular-Resolution Bidirectional Neural Interface (RCCRBNI)
 
 ## Result
-- Running Epsilon Greedy for 50000 iteration on 2022-11-28-1 dataset, then act greedy according to the produced Q
+### 2022-11-28-1 dataset
+Running Epsilon Greedy for 50000 iteration, then act greedy according to the produced Q
 ```
 Number of non-zero entries: 1762
 
@@ -25,7 +26,8 @@ Original Magnitude Cosine Similarity:  208.15777130551677
 New Magnitude Cosine Similarity:  182.17056389141385
 ```
 
-- Running Epsilon Greedy for 50000 iteration on 2022-11-04-2 dataset, then act greedy according to the produced Q
+### 2022-11-04-2 dataset
+Running Epsilon Greedy for 50000 iteration, then act greedy according to the produced Q
 ```
 Number of non-zero entries: 1525
 
