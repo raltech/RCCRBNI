@@ -25,30 +25,6 @@ def main():
 
     # display_non_zero(agent.Q, top_k=10)
 
-    
-    # # choose state
-    # state = 0
-    # max_entry = 1000
-    # # best_actions = np.argsort(Q[state])[::-1]
-    # best_actions = np.nonzero(Q[state])[0]
-    # print(best_actions.shape)
-    # new_dict = env.get_est_dictionary()[best_actions,:]
-    # print(new_dict.shape)
-    # for i in range(10):
-    #     print(new_dict[i,:])
-
-
-    # new_dict = []
-    # count = 0
-    # for a in tqdm(best_actions):
-    #     if count >= max_entry:
-    #         break
-    #     entry, found = get_dict_from_action_idx(a, env.n_amps, path)
-    #     if found:
-    #         new_dict.append(entry)
-    #         count += 1
-    # new_dict = np.array(new_dict)
-
     dict = load_dictionary(path)[0]
     original_span = span_score_func(dict)
     original_cosine_sim = cosine_sim_score_func(dict)
