@@ -37,12 +37,14 @@ def get_dict_from_action_idx(action_idx, n_amps, path):
     try:
         idx = np.where((elecs == elec) & (amps == amp))[0][0]
         dict_entry = dict[idx]
+        found = True
     except IndexError:
-        print(f"Electrode {elec} with amplitude {amp} was not in the dictionary")
-        print(f"Assume no cells were activated")
+        # print(f"Electrode {elec} with amplitude {amp} was not in the dictionary")
+        # print(f"Assume no cells were activated")
         dict_entry = np.zeros(len(cell_ids), dtype=np.float64)
+        found = False
 
-    return dict_entry
+    return dict_entry, found
 
 def load_dictionary(path):
     # Load relevant data from .npz files

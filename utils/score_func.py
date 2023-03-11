@@ -18,6 +18,9 @@ def cosine_sim_score_func(vectors):
     # calculate the magnitude of each vector
     mag = np.linalg.norm(vectors, axis=1)
 
+    # if the magnitude is 0, then change the magnitude to 1
+    mag[mag == 0] = 1
+
     # calculate the cosine similarity between each vector and unit vector
     for d in range(dim):
         unit_vec = np.zeros(dim)
