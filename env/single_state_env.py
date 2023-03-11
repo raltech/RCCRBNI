@@ -63,6 +63,7 @@ class SingleStateEnvironment:
         self.done = False
         self.reward = 0
         self.dict_hat = np.zeros((self.n_elecs*self.n_amps, len(self.cell_ids)), dtype=np.uint16)
+        self.dict_hat_count = np.zeros((self.n_elecs*self.n_amps), dtype=np.uint16)
         self.state = 0
         return self.state
     
@@ -75,6 +76,7 @@ class SingleStateEnvironment:
         else:
             sampled_activations = self.sample(self.elec, self.amp)
             self.dict_hat[(self.elec-1)*self.n_amps + (self.amp-1)] += sampled_activations
+            self.dict_hat_count[(self.elec-1)*self.n_amps + (self.amp-1)] += 1
             self.reward = self.reward_func(sampled_activations)
             self.n_step += 1
         return self.state, self.reward, self.done
@@ -107,6 +109,9 @@ class SingleStateEnvironment:
     
     def render(self, elec, amp):
         print(self.dict_hat[(elec-1)*self.n_amps + (amp-1)])
+
+    def get_est_dictionary(self):
+        return self.dict_hat / self.dict_hat_count[:,np.newaxis]
     
     def close(self):
         pass
