@@ -31,18 +31,13 @@ Functions:
     - close: closes the simulation
 '''
 class SingleStateEnvironment:
-    def __init__(self, path, reward_func, score_func, n_maxstep, n_elecs, n_amps, debug=False):
-        # Load relevant data from .npz files
-        try:
-            with np.load(os.path.join(path,"dictionary.npz")) as data:
-                self.dict = data["dictionary"]
-                self.elecs = data["entry_elecs"]
-                self.amps = data["entry_amps"]
-                self.elec_map = data["elec_map"]
-            with np.load(os.path.join(path,"decoders.npz")) as data:
-                self.cell_ids = data["cell_ids"]
-        except FileNotFoundError:
-            print("Please make sure the dictionary.npz and decoders.npz files are present in the specified path")
+    def __init__(self, data, reward_func, score_func, n_maxstep, n_elecs, n_amps, debug=False):
+        # Load relevant data 
+        self.dict = data[0]
+        self.elecs = data[1]
+        self.amps = data[2]
+        self.elec_map = data[3]
+        self.cell_ids = data[4]
 
         # Initialize variables
         self.reward_func = reward_func
@@ -74,14 +69,14 @@ class SingleStateEnvironment:
         if self.n_step >= self.n_maxstep:
             self.done = True
         else:
-            sampled_activations = self.sample(self.elec, self.amp)
+            sampled_activations = self.generate_sample(self.elec, self.amp)
             self.dict_hat[(self.elec-1)*self.n_amps + (self.amp-1)] += sampled_activations
             self.dict_hat_count[(self.elec-1)*self.n_amps + (self.amp-1)] += 1
             self.reward = self.reward_func(sampled_activations)
             self.n_step += 1
         return self.state, self.reward, self.done
     
-    def sample(self, elec, amp):
+    def generate_sample(self, elec, amp):
         try:
             idx = np.where((self.elecs == elec) & (self.amps == amp))[0][0]
             dist = self.dict[idx]
@@ -106,12 +101,6 @@ class SingleStateEnvironment:
         sampled_activations = np.random.binomial(1, dist).astype(dtype=np.uint8)
 
         return sampled_activations
-    
-    def render(self, elec, amp):
-        print(self.dict_hat[(elec-1)*self.n_amps + (amp-1)])
 
     def get_est_dictionary(self):
         return self.dict_hat / self.dict_hat_count[:,np.newaxis]
-    
-    def close(self):
-        pass
