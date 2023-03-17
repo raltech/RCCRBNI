@@ -12,6 +12,13 @@ def span_score_func(vectors):
     span = np.linalg.matrix_rank(vectors)
     return span
 
+def volume_score_func(vectors):
+    dot_products = []
+    for i in range(len(vectors)):
+        for j in range(i + 1, len(vectors)):
+            dot_products.append(np.abs(np.dot(vectors[i], vectors[j])))
+    return sum(dot_products) / len(dot_products)
+
 def cosine_sim_score_func(vectors):
     score = 0.0
     _, dim = vectors.shape
@@ -38,6 +45,9 @@ def mag_cosine_sim_score_func(vectors):
 
     # calculate the magnitude difference between each vector and unit vector
     abs_mag_diff = np.abs(mag - 1)
+
+    # if the magnitude is 0, then change the magnitude to 1
+    mag[mag == 0] = 1
 
     # calculate the cosine similarity between each vector and unit vector
     for d in range(dim):

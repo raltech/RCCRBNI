@@ -15,3 +15,5 @@ Epsilon Greedy
 
 Tompson Sampling
 ![](assets/Figure_4.png)
+
+<!-- plot the histrogram of the nubmer of visit counts of each action -->
