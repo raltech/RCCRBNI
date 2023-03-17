@@ -3,8 +3,8 @@ from env.single_state_env import SingleStateEnvironment
 from utils.reward_func import inverse_reward_func, max_cosine_sim_reward_func
 from utils.score_func import span_score_func, cosine_sim_score_func
 from utils.helper import display_non_zero, get_dict_from_action_idx, load_dictionary, action2elec_amp
-from agent.epsilon_greedy import EpsilonGreedyAgent
-from agent.thompson_sampling import TSAgent
+from agent.epsilon_greedy_agent import EpsilonGreedyAgent
+from agent.ts_agent import TSAgent
 from agent.sarsa_agent import SARSAAgent
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -48,7 +48,7 @@ def main(n_iterations, log_freq, plot_histogram):
 
         # average the span score over multiple runs
         span_score_hist_list = []
-        for _ in tqdm(range(2)):
+        for _ in tqdm(range(5)):
             # keep track of the score
             span_score_hist = []
 
@@ -111,4 +111,4 @@ def main(n_iterations, log_freq, plot_histogram):
     plt.show()
 
 if __name__ == "__main__":
-    main(n_iterations=100001, log_freq=5000, plot_histogram=False)
+    main(n_iterations=500001, log_freq=5000, plot_histogram=False)
