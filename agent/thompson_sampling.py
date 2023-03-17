@@ -23,8 +23,8 @@ class TSAgent:
     
     def update(self, state, action, reward, next_state):
         self.n[state, action] += 1
-        # self.Q[self.state, action] = reward + self.gamma*np.max(self.Q[next_state])
-        self.Q[state, action] += self.lr*(reward + self.gamma*np.max(self.Q[next_state]) - self.Q[state, action])
+        self.Q[state, action] = reward + self.gamma*np.max(self.Q[next_state])
+        # self.Q[state, action] += self.lr*(reward + self.gamma*np.max(self.Q[next_state]) - self.Q[state, action])
     
     def get_Q(self):
         return self.Q.copy()

@@ -1,8 +1,6 @@
 import numpy as np
-from tqdm import tqdm
 
-# Eplison Greedy Agent
-class EpsilonGreedyAgent:
+class SARSAAgent:
     def __init__(self, env, epsilon=0.8, gamma=0.9, decay_rate=1.0, lr=0.1):
         self.env = env
         self.epsilon = epsilon
@@ -21,9 +19,9 @@ class EpsilonGreedyAgent:
         return action_idx
     
     def update(self, state, action, reward, next_state):
+        next_action = self.choose_action()
         self.n[state, action] += 1
-        self.Q[state, action] = reward + self.gamma*np.max(self.Q[next_state])
-        # self.Q[state, action] += self.lr*(reward + self.gamma*np.max(self.Q[next_state]) - self.Q[state, action])
+        self.Q[state, action] += self.lr * (reward + self.gamma * self.Q[next_state, next_action] - self.Q[state, action])
         self.epsilon *= self.decay_rate
 
     def get_Q(self):
