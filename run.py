@@ -27,7 +27,7 @@ def main(n_iterations, log_freq, plot_histogram):
     original_span_score = span_score_func(data[0])
     print(f"Span score of the dictionary: {original_span_score}")
 
-    env = SingleStateEnvironment(data, reward_func=max_cosine_sim_reward_func, n_maxstep=N_EXAUSTIVE_SEARCH,
+    env = SingleStateEnvironment(data, reward_func=inverse_reward_func, n_maxstep=N_EXAUSTIVE_SEARCH,
                                  n_elecs=N_ELECTRODES, n_amps=N_AMPLITUDES)
     
     # keep track of the span score for each agent
