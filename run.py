@@ -1,11 +1,12 @@
 import numpy as np
 from env.single_state_env import SingleStateEnvironment
-from utils.reward_func import inverse_reward_func
+from utils.reward_func import inverse_reward_func, scatter_reward_function
 from utils.score_func import span_score_func, scatter_matrix_score_func
 from utils.helper import load_dictionary, action2elec_amp
 from agent.epsilon_greedy import EpsilonGreedyAgent
 from agent.thompson_sampling import TSAgent
 from agent.sarsa_agent import SARSAAgent
+from agent.ucb1_agent import UCB1Agent
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
@@ -13,39 +14,25 @@ N_ELECTRODES = 512
 N_AMPLITUDES = 42
 N_EXAUSTIVE_SEARCH = N_ELECTRODES * N_AMPLITUDES * 25
 
-def main(n_iterations, log_freq, plot_histogram=False):
+def main(n_search, log_freq, plot_histogram=False):
     experiments = ["2022-11-04-2", "2022-11-28-1"]
     path = f"./data/{experiments[1]}/dictionary"
     agent_list = ["RandomAgent", "EpsilonGreedyAgent", "DecayEpsilonGreedyAgent", 
-                  "TSAgent", "SARSAAgent"]
+                  "TSAgent", "SARSAAgent", "UCB1Agent"]
+    # agent_list = ["UCB1Agent"]
 
     # data: (dict, elecs, amps, elec_map, cell_ids)
     data = load_dictionary(path)
 
     # calculate the span score of the dictionary
-    original_span_score = scatter_matrix_score_func(data[0])
-    print(f"Span score of the dictionary: {original_span_score}")
-
-    env = SingleStateEnvironment(data, reward_func=inverse_reward_func, score_func=scatter_matrix_score_func, 
-                                 n_maxstep=N_EXAUSTIVE_SEARCH, n_elecs=N_ELECTRODES, n_amps=N_AMPLITUDES)
+    baseline_score = scatter_matrix_score_func(data[0])
+    print(f"Span score of the exhaustive dictionary: {baseline_score}")
     
     # average the scores for multiple runs
     avg_score_hist_list = []
-    n_avg_itr = 2
+    n_avg_itr = 1
     
     for agent_name in agent_list:
-        if agent_name == "RandomAgent":
-            agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=1.0, decay_rate=1, lr=0.1)
-        elif agent_name == "EpsilonGreedyAgent":
-            agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=0.8, decay_rate=1, lr=0.1)
-        elif agent_name == "DecayEpsilonGreedyAgent":
-            agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=1.0, decay_rate=1-10e-8, lr=0.1)
-        elif agent_name == "TSAgent":
-            agent = TSAgent(env, gamma=0.9, lr=0.1)
-        elif agent_name == "SARSAAgent":
-            agent = SARSAAgent(env, epsilon=0.8, gamma=0.9, lr=0.1)
-        else:
-            raise ValueError("Agent name not found")
         print("\n========================================")
         print(f"Agent: {agent_name}")
 
@@ -55,14 +42,31 @@ def main(n_iterations, log_freq, plot_histogram=False):
         for avg_itr in range(n_avg_itr):
             print(f"Average iteration: {avg_itr+1}/{n_avg_itr}")
 
-            # reset the environment
-            env.reset()
+            # initialize the environment
+            env = SingleStateEnvironment(data, reward_func=scatter_reward_function, score_func=scatter_matrix_score_func, 
+                                 n_maxstep=N_EXAUSTIVE_SEARCH, n_elecs=N_ELECTRODES, n_amps=N_AMPLITUDES)
+            
+            # initialize the agent
+            if agent_name == "RandomAgent":
+                agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=1.0, decay_rate=1, lr=0.1)
+            elif agent_name == "EpsilonGreedyAgent":
+                agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=0.8, decay_rate=1, lr=0.1)
+            elif agent_name == "DecayEpsilonGreedyAgent":
+                agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=1.0, decay_rate=1-10e-8, lr=0.1)
+            elif agent_name == "TSAgent":
+                agent = TSAgent(env, gamma=0.9, lr=0.1)
+            elif agent_name == "SARSAAgent":
+                agent = SARSAAgent(env, epsilon=0.8, gamma=0.9, lr=0.1)
+            elif agent_name == "UCB1Agent":
+                agent = UCB1Agent(env, gamma=0.9, c=1.0, lr=0.1)
+            else:
+                raise ValueError("Agent name not found")
             
             # keep track of the score
             score_hist = []
 
             # run the experiment
-            for i in tqdm(range(n_iterations)):
+            for i in tqdm(range(n_search)):
                 state = env.state
                 if i % log_freq == 0 and i != 0:
                     good_actions = np.nonzero(agent.Q[state])[0]
@@ -85,8 +89,9 @@ def main(n_iterations, log_freq, plot_histogram=False):
     ax.set_ylabel("Score")
     ax.set_title("Span Score")
     ax.legend()
-    ax.axvline(x=N_EXAUSTIVE_SEARCH/log_freq, color="black", linestyle="--")
-    ax.axhline(y=original_span_score, color="black", linestyle="--")
+    # ax.axvline(x=N_EXAUSTIVE_SEARCH/log_freq, color="black", linestyle="--")
+    ax.axhline(y=baseline_score, color="black", linestyle="--")
+    fig.savefig(f"./assets/scores_{n_search}_{n_avg_itr}.png")
     plt.show()
 
     if plot_histogram:
@@ -112,4 +117,4 @@ def main(n_iterations, log_freq, plot_histogram=False):
         plt.show()
 
 if __name__ == "__main__":
-    main(n_iterations=100000, log_freq=5000)
+    main(n_search=2000, log_freq=10)

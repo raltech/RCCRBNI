@@ -72,7 +72,8 @@ class SingleStateEnvironment:
             sampled_activations = self.generate_sample(self.elec, self.amp)
             self.dict_hat[(self.elec-1)*self.n_amps + (self.amp-1)] += sampled_activations
             self.dict_hat_count[(self.elec-1)*self.n_amps + (self.amp-1)] += 1
-            self.reward = self.reward_func(sampled_activations)
+            dict = self.get_est_dictionary()[np.nonzero(self.dict_hat_count)[0]]
+            self.reward = self.reward_func(sampled_activations, dict)
             self.n_step += 1
         return self.state, self.reward, self.done
     
@@ -103,4 +104,4 @@ class SingleStateEnvironment:
         return sampled_activations
 
     def get_est_dictionary(self):
-        return self.dict_hat / (self.dict_hat_count[:, np.newaxis] + 1e-8)
+        return np.copy(self.dict_hat / (self.dict_hat_count[:, np.newaxis] + 1e-8))
