@@ -103,4 +103,4 @@ class SingleStateEnvironment:
         return sampled_activations
 
     def get_est_dictionary(self):
-        return self.dict_hat / self.dict_hat_count[:,np.newaxis]
+        return self.dict_hat / (self.dict_hat_count[:, np.newaxis] + 1e-8)

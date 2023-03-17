@@ -5,6 +5,16 @@ import os
 Score func calculates how well the produced dictionary is
 Score is between 0 and the number of cells
 '''
+
+def scatter_matrix_score_func(vectors):
+    # calculate the average variance associated with each action
+    avg_var = np.mean(np.var(vectors, axis=1))
+
+    # calculate the eigenvalues of scatter matrix
+    eigvals = np.linalg.eigvals(np.transpose(vectors) @ vectors)
+
+    return np.sum(eigvals < avg_var)
+
 def span_score_func(vectors):
     # calculate the span of a set of vectors
     # :param vectors: list of vectors
