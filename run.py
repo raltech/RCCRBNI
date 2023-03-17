@@ -48,7 +48,7 @@ def main(n_iterations, log_freq, plot_histogram):
 
         # average the span score over multiple runs
         span_score_hist_list = []
-        for _ in tqdm(range(5)):
+        for _ in tqdm(range(1)):
             # keep track of the score
             span_score_hist = []
 
