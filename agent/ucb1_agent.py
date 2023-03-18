@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 # UCB1 Agent
 class UCB1Agent:
-    def __init__(self, env, gamma=0.9, c=0.5, lr=0.1):
+    def __init__(self, env, gamma=0.9, c=2, lr=0.1):
         self.env = env
         self.gamma = gamma
         self.c = c
@@ -14,9 +14,12 @@ class UCB1Agent:
     
     def choose_action(self):
         sum_n = np.sum(self.n[self.env.state])
-        bonus = self.c*np.sqrt(np.log(sum_n)/self.n[self.env.state])
-
-        action_idx = np.argmax(self.Q[self.env.state]+bonus)
+        if sum_n == 0:
+            action_idx = np.random.randint(0, self.env.n_elecs*self.env.n_amps)
+        else:
+            # exploration bonus
+            bonus = self.c*np.sqrt(np.log(sum_n)/(self.n[self.env.state] + 1e-8))
+            action_idx = np.argmax(self.Q[self.env.state]+bonus)
         return action_idx
     
     def update(self, state, action, reward, next_state):

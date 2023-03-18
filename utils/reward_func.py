@@ -19,3 +19,6 @@ def scatter_reward_function(array, dict):
     eigvals = np.linalg.eigvals(np.transpose(dict) @ dict)
 
     return np.sum(eigvals[eigvals < avg_var]).real
+
+def diversity_reward_function(array, dict):
+    

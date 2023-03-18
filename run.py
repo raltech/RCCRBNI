@@ -48,17 +48,17 @@ def main(n_search, log_freq, plot_histogram=False):
             
             # initialize the agent
             if agent_name == "RandomAgent":
-                agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=1.0, decay_rate=1, lr=0.1)
+                agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=1.0, decay_rate=1, lr=0.1)
             elif agent_name == "EpsilonGreedyAgent":
-                agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=0.8, decay_rate=1, lr=0.1)
+                agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=0.8, decay_rate=1, lr=0.1)
             elif agent_name == "DecayEpsilonGreedyAgent":
-                agent = EpsilonGreedyAgent(env, gamma=0.7, epsilon=1.0, decay_rate=1-10e-8, lr=0.1)
+                agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=1.0, decay_rate=1-10e-8, lr=0.1)
             elif agent_name == "TSAgent":
                 agent = TSAgent(env, gamma=0.9, lr=0.1)
             elif agent_name == "SARSAAgent":
-                agent = SARSAAgent(env, epsilon=0.8, gamma=0.9, lr=0.1)
+                agent = SARSAAgent(env, gamma=0.9, epsilon=0.8, lr=0.1)
             elif agent_name == "UCB1Agent":
-                agent = UCB1Agent(env, gamma=0.9, c=1.0, lr=0.1)
+                agent = UCB1Agent(env, gamma=0.9, c=2.0, lr=0.1)
             else:
                 raise ValueError("Agent name not found")
             
@@ -72,7 +72,10 @@ def main(n_search, log_freq, plot_histogram=False):
                     good_actions = np.nonzero(agent.Q[state])[0]
                     # print(f"Number of good actions: {good_actions.shape}")
                     approx_dict = env.get_est_dictionary()[good_actions,:]
-                    score_hist.append(scatter_matrix_score_func(approx_dict))
+                    if len(approx_dict) == 0:
+                        score_hist.append(0)
+                    else:
+                        score_hist.append(scatter_matrix_score_func(approx_dict))
                 action = agent.choose_action()
                 next_state, reward, done = env.step(action2elec_amp(action, N_AMPLITUDES))
                 agent.update(state, action, reward, next_state)
@@ -85,7 +88,7 @@ def main(n_search, log_freq, plot_histogram=False):
     fig, ax = plt.subplots()
     for i, agent_name in enumerate(agent_list):
         ax.plot(avg_score_hist_list[i], label=agent_name)
-    ax.set_xlabel("Episode {0}k".format(log_freq//1000))
+    ax.set_xlabel("Episode {0}k".format(log_freq/1000))
     ax.set_ylabel("Score")
     ax.set_title("Span Score")
     ax.legend()
@@ -117,4 +120,4 @@ def main(n_search, log_freq, plot_histogram=False):
         plt.show()
 
 if __name__ == "__main__":
-    main(n_search=2000, log_freq=10)
+    main(n_search=10000, log_freq=10)
