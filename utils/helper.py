@@ -82,11 +82,12 @@ def load_dictionary(path, usage_path):
         for i in range(actions.shape[0]):
             action_counts[actions[i,1]-1, actions[i,2]-1] += 1
         # Calculate probability of selecting each electrical stimulus
-        action_counts /= actions.shape[0]
-        # Associate actions with dictionary entries
-        usage = np.zeros(elecs.size)
-        for i in range(elecs.size):
-            usage[i] = action_counts[elecs[i]-1, amps[i]-1]
+        # action_counts /= actions.shape[0]
+        # # Associate actions with dictionary entries
+        # usage = np.zeros(elecs.size)
+        # for i in range(elecs.size):
+        #     usage[i] = action_counts[elecs[i]-1, amps[i]-1]
+        usage = action_counts.flatten()
     except FileNotFoundError:
         print("Please make sure the gdm.sef_txt file is present in the specified path")
 
