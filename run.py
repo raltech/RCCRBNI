@@ -16,7 +16,7 @@ N_AMPLITUDES = 42
 N_EXAUSTIVE_SEARCH = N_ELECTRODES * N_AMPLITUDES * 25
 
 def main(n_search, log_freq, plot_histogram=False):
-    score_func = qr_rank_score_func
+    score_func = RREF_score_func
     reward_func = diversity_reward_function
     experiments = ["2022-11-04-2", "2022-11-28-1"]
     path = f"./data/{experiments[0]}/dictionary"
@@ -78,7 +78,7 @@ def main(n_search, log_freq, plot_histogram=False):
                     if len(approx_dict) == 0:
                         score_hist.append(0)
                     else:
-                        score_hist.append(score_func(approx_dict, dict_hat_count=env.dict_hat_count))
+                        score_hist.append(score_func(data[0], dict_hat_count=env.dict_hat_count))
                 action = agent.choose_action()
                 next_state, reward, done = env.step(action2elec_amp(action, N_AMPLITUDES))
                 agent.update(state, action, reward, next_state)
@@ -123,4 +123,4 @@ def main(n_search, log_freq, plot_histogram=False):
         plt.show()
 
 if __name__ == "__main__":
-    main(n_search=500000, log_freq=10000)
+    main(n_search=200001, log_freq=50000)
