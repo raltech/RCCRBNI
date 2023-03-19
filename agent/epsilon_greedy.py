@@ -10,7 +10,7 @@ class EpsilonGreedyAgent:
         self.decay_rate = decay_rate
         self.lr = lr
         self.Q = np.zeros((env.n_states, env.n_elecs*env.n_amps), dtype=np.float32)
-        self.n = np.zeros((env.n_states, env.n_elecs*env.n_amps), dtype=np.uint16)
+        # self.n = np.zeros((env.n_states, env.n_elecs*env.n_amps), dtype=np.uint32)
         self.done = False
     
     def choose_action(self):
@@ -21,7 +21,7 @@ class EpsilonGreedyAgent:
         return action_idx
     
     def update(self, state, action, reward, next_state):
-        self.n[state, action] += 1
+        # self.n[state, action] += 1
         # self.Q[self.state, action] = reward + self.gamma*np.max(self.Q[next_state])
         self.Q[state, action] += self.lr*(reward + self.gamma*np.max(self.Q[next_state]) - self.Q[state, action])
         self.epsilon *= self.decay_rate
@@ -29,5 +29,5 @@ class EpsilonGreedyAgent:
     def get_Q(self):
         return self.Q.copy()
     
-    def get_n(self):
-        return self.n.copy()
+    # def get_n(self):
+    #     return self.n.copy()

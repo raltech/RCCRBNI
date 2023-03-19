@@ -9,7 +9,7 @@ class UCB1Agent:
         self.c = c
         self.lr = lr
         self.Q = np.zeros((env.n_states, env.n_elecs*env.n_amps), dtype=np.float32)
-        self.n = np.zeros((env.n_states, env.n_elecs*env.n_amps), dtype=np.uint16)
+        self.n = np.zeros((env.n_states, env.n_elecs*env.n_amps), dtype=np.uint32)
         self.done = False
     
     def choose_action(self):
