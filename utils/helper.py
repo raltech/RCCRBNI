@@ -60,3 +60,34 @@ def load_dictionary(path):
         print("Please make sure the dictionary.npz and decoders.npz files are present in the specified path")
 
     return dict, elecs, amps, elec_map, cell_ids
+
+def load_dictionary(path, usage_path):
+    # Load relevant data from .npz files
+    try:
+        with np.load(os.path.join(path,"dictionary.npz")) as data:
+            dict = data["dictionary"]
+            elecs = data["entry_elecs"]
+            amps = data["entry_amps"]
+            elec_map = data["elec_map"]
+        with np.load(os.path.join(path,"decoders.npz")) as data:
+            cell_ids = data["cell_ids"]
+    except FileNotFoundError:
+        print("Please make sure the dictionary.npz and decoders.npz files are present in the specified path")
+
+    # Load empirical dictionary usage distribution
+    try:
+        # Tally all actions during greedy stimulation sequence
+        actions = np.loadtxt(os.path.join(usage_path,"gdm.sef_txt")).astype(int)[1:] # Ignore hardware instructions in the first row
+        action_counts = np.zeros((512,42))
+        for i in range(actions.shape[0]):
+            action_counts[actions[i,1]-1, actions[i,2]-1] += 1
+        # Calculate probability of selecting each electrical stimulus
+        action_counts /= actions.shape[0]
+        # Associate actions with dictionary entries
+        usage = np.zeros(elecs.size)
+        for i in range(elecs.size):
+            usage[i] = action_counts[elecs[i]-1, amps[i]-1]
+    except FileNotFoundError:
+        print("Please make sure the gdm.sef_txt file is present in the specified path")
+
+    return dict, elecs, amps, elec_map, cell_ids, usage
