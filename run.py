@@ -19,13 +19,15 @@ def main(n_search, log_freq, plot_histogram=False):
     score_func = RREF_score_func
     reward_func = diversity_reward_function
     experiments = ["2022-11-04-2", "2022-11-28-1"]
-    path = f"./data/{experiments[0]}/dictionary"
+    experiment = experiments[1]
+    path = f"./data/{experiment}/dictionary"
+    usage_path = f"/Volumes/Scratch/Users/ajphillips/gdm_streamed/{experiment}/estim" # TODO CHANGEME
     agent_list = ["RandomAgent", "EpsilonGreedyAgent", "DecayEpsilonGreedyAgent", 
                   "TSAgent", "SARSAAgent", "UCB1Agent"]
     # agent_list = ["UCB1Agent"]
 
-    # data: (dict, elecs, amps, elec_map, cell_ids)
-    data = load_dictionary(path)
+    # data: (dict, elecs, amps, elec_map, cell_ids, usage)
+    data = load_dictionary(path, usage_path)
 
     # calculate the span score of the dictionary
     baseline_score = score_func(data[0], dict_hat_count=np.ones(data[0].shape[0])*25)
