@@ -31,7 +31,7 @@ Functions:
     - close: closes the simulation
 '''
 class SingleStateEnvironment:
-    def __init__(self, data, reward_func, score_func, n_maxstep, n_elecs, n_amps, debug=False):
+    def __init__(self, data, reward_func, n_maxstep, n_elecs, n_amps, debug=False):
         # Load relevant data 
         self.dict = data[0]
         self.elecs = data[1]
@@ -41,7 +41,6 @@ class SingleStateEnvironment:
 
         # Initialize variables
         self.reward_func = reward_func
-        self.score_func = score_func
         self.n_maxstep = n_maxstep
         self.n_elecs = n_elecs
         self.n_amps = n_amps
@@ -72,8 +71,9 @@ class SingleStateEnvironment:
             sampled_activations = self.generate_sample(self.elec, self.amp)
             self.dict_hat[(self.elec-1)*self.n_amps + (self.amp-1)] += sampled_activations
             self.dict_hat_count[(self.elec-1)*self.n_amps + (self.amp-1)] += 1
-            dict = self.get_est_dictionary()[np.nonzero(self.dict_hat_count)[0]]
-            self.reward = self.reward_func(sampled_activations, dict)
+            # dict = self.get_est_dictionary()[np.nonzero(self.dict_hat_count)[0]]
+            # self.reward = self.reward_func(sampled_activations, dict)
+            self.reward = self.reward_func(sampled_activations, self.dict_hat, self.dict_hat_count)
             self.n_step += 1
         return self.state, self.reward, self.done
     

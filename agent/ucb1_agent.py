@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 # UCB1 Agent
 class UCB1Agent:
-    def __init__(self, env, gamma=0.9, c=2, lr=0.1):
+    def __init__(self, env, gamma, c, lr):
         self.env = env
         self.gamma = gamma
         self.c = c

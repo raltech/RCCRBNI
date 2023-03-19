@@ -1,7 +1,7 @@
 import numpy as np
 
 class SARSAAgent:
-    def __init__(self, env, epsilon=0.8, gamma=0.9, lr=0.1):
+    def __init__(self, env, epsilon, gamma, lr):
         self.env = env
         self.epsilon = epsilon
         self.gamma = gamma
