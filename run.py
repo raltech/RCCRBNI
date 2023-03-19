@@ -17,7 +17,7 @@ N_EXAUSTIVE_SEARCH = N_ELECTRODES * N_AMPLITUDES * 25
 
 def main(n_search, log_freq, plot_histogram=False):
     score_func = relevance_score_func
-    reward_func = diversity_reward_function
+    reward_func = inverse_reward_func
     experiments = ["2022-11-04-2", "2022-11-28-1"]
     experiment = experiments[0]
     path = f"./data/{experiment}/dictionary"
@@ -37,7 +37,7 @@ def main(n_search, log_freq, plot_histogram=False):
     
     # average the scores for multiple runs
     avg_score_hist_list = []
-    n_avg_itr = 10
+    n_avg_itr = 2
     
     for agent_name in agent_list:
         print("\n========================================")
@@ -57,15 +57,15 @@ def main(n_search, log_freq, plot_histogram=False):
             if agent_name == "RandomAgent":
                 agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=1.0, decay_rate=1, lr=0.1)
             elif agent_name == "EpsilonGreedyAgent":
-                agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=0.8, decay_rate=1, lr=0.1)
+                agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=0.6, decay_rate=1, lr=0.1)
             elif agent_name == "DecayEpsilonGreedyAgent":
-                agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=1.0, decay_rate=1-10e-8, lr=0.1)
+                agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=1.0, decay_rate=1-10e-6, lr=0.1)
             elif agent_name == "TSAgent":
                 agent = TSAgent(env, gamma=0.9, lr=0.1)
             elif agent_name == "SARSAAgent":
-                agent = SARSAAgent(env, gamma=0.9, epsilon=0.8, lr=0.1)
+                agent = SARSAAgent(env, gamma=0.9, epsilon=0.4, lr=0.1)
             elif agent_name == "UCB1Agent":
-                agent = UCB1Agent(env, gamma=0.9, c=2.0, lr=0.1)
+                agent = UCB1Agent(env, gamma=0.9, c=1.0, lr=0.1)
             else:
                 raise ValueError("Agent name not found")
             
@@ -95,7 +95,7 @@ def main(n_search, log_freq, plot_histogram=False):
     fig, ax = plt.subplots()
     for i, agent_name in enumerate(agent_list):
         ax.plot(avg_score_hist_list[i], label=agent_name)
-    ax.set_xlabel("Episode {0}k".format(log_freq//1000))
+    ax.set_xlabel("Episode {0}k".format(log_freq/1000))
     ax.set_ylabel("Score")
     ax.set_title("Score")
     ax.legend()
@@ -127,4 +127,4 @@ def main(n_search, log_freq, plot_histogram=False):
         plt.show()
 
 if __name__ == "__main__":
-    main(n_search=500001, log_freq=1000)
+    main(n_search=505001, log_freq=500)
