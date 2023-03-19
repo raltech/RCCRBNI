@@ -57,7 +57,7 @@ class SingleStateEnvironment:
         self.done = False
         self.reward = 0
         self.dict_hat = np.zeros((self.n_elecs*self.n_amps, len(self.cell_ids)), dtype=np.uint16)
-        self.dict_hat_count = np.zeros((self.n_elecs*self.n_amps), dtype=np.uint16)
+        self.dict_hat_count = np.zeros((self.n_elecs*self.n_amps), dtype=np.uint32)
         self.state = 0
         return self.state
     
