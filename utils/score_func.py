@@ -7,7 +7,6 @@ Score is between 0 and the number of cells
 '''
 
 def relevance_score_func(A, dict_hat_count=None, relevance=None):
-    import pdb; pdb.set_trace()
     return np.dot(dict_hat_count, relevance)
 
 
