@@ -23,6 +23,8 @@ def grid_search(agent_class, hyperparameter_ranges, env, data, n_search, log_fre
 
     for hyperparameters in itertools.product(*hyperparameter_ranges.values()):
         hyperparameters_dict = dict(zip(hyperparameter_ranges.keys(), hyperparameters))
+
+        print(f"hyperparameters: {hyperparameters_dict}")
         
         score_hist_list = []
 
@@ -49,6 +51,7 @@ def grid_search(agent_class, hyperparameter_ranges, env, data, n_search, log_fre
             score_hist_list.append(score_hist)
 
         avg_score = np.mean(score_hist_list, axis=0)[-1]
+        print(f"avg_score: {avg_score}")
 
         if avg_score > best_score:
             best_score = avg_score
@@ -67,7 +70,7 @@ def main(n_search, log_freq, plot_histogram=False):
     usage_path = f"./data/{experiment}/estim"
     # agent_list = ["RandomAgent", "EpsilonGreedyAgent", "DecayEpsilonGreedyAgent", 
     #               "TSAgent", "SARSAAgent", "UCB1Agent"]
-    agent_list = ["DecayEpsilonGreedyAgent"]
+    agent_list = ["SARSAAgent"]
 
     # data: (dict, elecs, amps, elec_map, cell_ids, usage)
     data = load_dictionary(path, usage_path)
@@ -75,11 +78,11 @@ def main(n_search, log_freq, plot_histogram=False):
 
     # calculate the span score of the dictionary
     baseline_score = score_func(data[0], dict_hat_count=np.ones(N_ELECTRODES*N_AMPLITUDES)*25, relevance=data[-1])
-    print(f"Span score of the exhaustive dictionary: {baseline_score}")
+    print(f"score of the exhaustive dictionary: {baseline_score}")
     
     # average the scores for multiple runs
     avg_score_hist_list = []
-    n_avg_itr = 5
+    n_avg_itr = 3
 
     for agent_name in agent_list:
         print("\n========================================")
@@ -96,7 +99,7 @@ def main(n_search, log_freq, plot_histogram=False):
         elif agent_name == "EpsilonGreedyAgent":
             hyperparameter_ranges = {
                 'gamma': [0.9],
-                'epsilon': [0.6, 0.8, 1.0],
+                'epsilon': [0.4, 0.6, 0.8, 0.9],
                 'decay_rate': [1],
                 'lr': [0.1]
             }
@@ -105,7 +108,7 @@ def main(n_search, log_freq, plot_histogram=False):
             hyperparameter_ranges = {
                 'gamma': [0.9],
                 'epsilon': [1.0],
-                'decay_rate': [1-10e-10, 1-10e-9, 1-10e-8, 1-10e-7, 1-10e-6],
+                'decay_rate': [1-10e-6, 1-10e-5, 1-10e-4],
                 'lr': [0.1]
             }
             agent_class = EpsilonGreedyAgent
@@ -118,14 +121,14 @@ def main(n_search, log_freq, plot_histogram=False):
         elif agent_name == "SARSAAgent":
             hyperparameter_ranges = {
                 'gamma': [0.9],
-                'epsilon': [0.6, 0.8, 1.0],
+                'epsilon': [0.1,0.2,0.3,0.4],
                 'lr': [0.1]
             }
             agent_class = SARSAAgent
         elif agent_name == "UCB1Agent":
             hyperparameter_ranges = {
                 'gamma': [0.9],
-                'c': [0.5, 2.0, 4.0, 6.0, 8.0, 10.0],
+                'c': [0.1, 0.5, 1.0],
                 'lr': [0.1]
             }
             agent_class = UCB1Agent
