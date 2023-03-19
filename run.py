@@ -1,7 +1,7 @@
 import numpy as np
 from env.single_state_env import SingleStateEnvironment
 from utils.reward_func import inverse_reward_func, scatter_reward_function, diversity_reward_function, more_cell_reward_func
-from utils.score_func import span_score_func, scatter_matrix_score_func, qr_rank_score_func, RREF_score_func
+from utils.score_func import span_score_func, scatter_matrix_score_func, qr_rank_score_func, RREF_score_func, relevance_score_func
 from utils.helper import load_dictionary, action2elec_amp
 from agent.epsilon_greedy import EpsilonGreedyAgent
 from agent.thompson_sampling import TSAgent
@@ -16,26 +16,28 @@ N_AMPLITUDES = 42
 N_EXAUSTIVE_SEARCH = N_ELECTRODES * N_AMPLITUDES * 25
 
 def main(n_search, log_freq, plot_histogram=False):
-    score_func = RREF_score_func
+    score_func = relevance_score_func
     reward_func = diversity_reward_function
     experiments = ["2022-11-04-2", "2022-11-28-1"]
-    experiment = experiments[1]
+    experiment = experiments[0]
     path = f"./data/{experiment}/dictionary"
     usage_path = f"/Volumes/Scratch/Users/ajphillips/gdm_streamed/{experiment}/estim" # TODO CHANGEME
+    usage_path = f"./data/{experiment}/estim"
     agent_list = ["RandomAgent", "EpsilonGreedyAgent", "DecayEpsilonGreedyAgent", 
-                  "TSAgent", "SARSAAgent", "UCB1Agent"]
+                  "SARSAAgent", "UCB1Agent"]
     # agent_list = ["UCB1Agent"]
 
     # data: (dict, elecs, amps, elec_map, cell_ids, usage)
     data = load_dictionary(path, usage_path)
+    # import pdb; pdb.set_trace()
 
     # calculate the span score of the dictionary
-    baseline_score = score_func(data[0], dict_hat_count=np.ones(data[0].shape[0])*25)
-    print(f"Span score of the exhaustive dictionary: {baseline_score}")
+    baseline_score = score_func(data[0], dict_hat_count=np.ones(N_ELECTRODES*N_AMPLITUDES)*25, relevance=data[-1])
+    print(f"score of the exhaustive dictionary: {baseline_score}")
     
     # average the scores for multiple runs
     avg_score_hist_list = []
-    n_avg_itr = 1
+    n_avg_itr = 10
     
     for agent_name in agent_list:
         print("\n========================================")
@@ -80,7 +82,7 @@ def main(n_search, log_freq, plot_histogram=False):
                     if len(approx_dict) == 0:
                         score_hist.append(0)
                     else:
-                        score_hist.append(score_func(data[0], dict_hat_count=env.dict_hat_count))
+                        score_hist.append(score_func(approx_dict, dict_hat_count=env.dict_hat_count, relevance=data[-1]))
                 action = agent.choose_action()
                 next_state, reward, done = env.step(action2elec_amp(action, N_AMPLITUDES))
                 agent.update(state, action, reward, next_state)
@@ -99,7 +101,7 @@ def main(n_search, log_freq, plot_histogram=False):
     ax.legend()
     ax.axvline(x=N_EXAUSTIVE_SEARCH/log_freq, color="black", linestyle="--")
     ax.axhline(y=baseline_score, color="black", linestyle="--")
-    fig.savefig(f"./assets/scores_{score_func.__name__}_{reward_func.__name__}_{n_search}_{n_avg_itr}.png")
+    fig.savefig(f"./assets/scores_{experiment}_{score_func.__name__}_{reward_func.__name__}_{n_search}_{n_avg_itr}.png")
     plt.show()
 
     if plot_histogram:
@@ -125,4 +127,4 @@ def main(n_search, log_freq, plot_histogram=False):
         plt.show()
 
 if __name__ == "__main__":
-    main(n_search=200001, log_freq=50000)
+    main(n_search=500001, log_freq=1000)
