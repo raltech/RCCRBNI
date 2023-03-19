@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 # Eplison Greedy Agent
 class EpsilonGreedyAgent:
-    def __init__(self, env, epsilon=0.8, gamma=0.9, decay_rate=1.0, lr=0.1):
+    def __init__(self, env, epsilon, gamma, decay_rate, lr):
         self.env = env
         self.epsilon = epsilon
         self.gamma = gamma

@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 # Thompson Sampling Agent
 class TSAgent:
-    def __init__(self, env, gamma=0.9, lr=0.1):
+    def __init__(self, env, gamma, lr):
         self.env = env
         self.gamma = gamma
         self.lr = lr
