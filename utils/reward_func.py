@@ -31,6 +31,6 @@ def diversity_reward_function(array, dict_hat, dict_hat_count):
     else:
         for idx in nonzero_idx:
             tmp = np.nonzero(dict_hat[:, idx])[0]
-            reward = 1/np.sum(dict_hat[tmp, idx] / dict_hat_count[tmp])
+            reward += 1/np.sum(dict_hat[tmp, idx] / dict_hat_count[tmp])
     return reward
     
