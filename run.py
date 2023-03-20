@@ -82,10 +82,9 @@ def main(n_search, log_freq, experiment, score_func, reward_func, n_avg_itr):
                         score_hist.append(0)
                     else:
                         score_hist.append(score_func(approx_dict, dict_hat_count=env.dict_hat_count, relevance=data[-1]))
-                    if score_hist[-1] > baseline_score*2:
-                        print("\nFound a 2x better dictionary at step {}. Score: {}".format(i, score_hist[-1]))
+                    if score_hist[-1] > baseline_score*3:
+                        print("\nFound a 3x better dictionary at step {}. Score: {}".format(i, score_hist[-1]))
                         # append the score_hist with the same score for the rest of the search
-                        # import pdb; pdb.set_trace()
                         score_hist.extend([score_hist[-1]]*((n_search-i)//log_freq))
                         break
                 action = agent.choose_action()
@@ -119,7 +118,7 @@ def main(n_search, log_freq, experiment, score_func, reward_func, n_avg_itr):
     ax.set_title(f"Scores of each agent on {experiment} with {reward_func.__name__}", fontsize=30)
     ax.tick_params(axis='both', which='major', labelsize=25)
     ax.legend(fontsize=25)
-    ax.set_ylim(0, baseline_score*1.7)
+    ax.set_ylim(0, baseline_score*2.7)
     ax.axvline(x=N_EXAUSTIVE_SEARCH/log_freq, color="black", linestyle="--")
     ax.axhline(y=baseline_score, color="black", linestyle="--")
     fig.savefig(f"./assets/scores/scores_{experiment}_{score_func.__name__}_{reward_func.__name__}_{n_search}_{n_avg_itr}.png", dpi=300)
@@ -129,8 +128,8 @@ if __name__ == "__main__":
     experiments = ["2022-11-04-2", "2022-11-28-1"]
     # main(n_search=510001, log_freq=10000, experiment=experiments[0], score_func=relevance_score_func, reward_func=diversity_reward_function)
     n_search = 520001
-    log_freq = 10000
-    n_avg_itr = 10
+    log_freq = 20000
+    n_avg_itr = 20
     print("Experiment 1: {}_{}_{}".format(experiments[0], relevance_score_func.__name__, diversity_reward_function.__name__))
     main(n_search=n_search, log_freq=log_freq, experiment=experiments[0], score_func=relevance_score_func, reward_func=diversity_reward_function, n_avg_itr=n_avg_itr)
 
