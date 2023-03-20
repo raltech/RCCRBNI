@@ -4,9 +4,7 @@ import numpy as np
 Reward func calculates the reward for the agent
 '''
 def inverse_reward_func(array, dict_hat, dict_hat_count):
-    if np.sum(array) == 1:
-        return 1
-    elif np.sum(array) == 0:
+    if np.sum(array) == 0:
         return 0
     else:
         return 1/np.sum(array)
@@ -32,5 +30,6 @@ def diversity_reward_function(array, dict_hat, dict_hat_count):
         for idx in nonzero_idx:
             tmp = np.nonzero(dict_hat[:, idx])[0]
             reward += 1/np.sum(dict_hat[tmp, idx] / dict_hat_count[tmp])
+        reward = reward / len(nonzero_idx)
     return reward
     
