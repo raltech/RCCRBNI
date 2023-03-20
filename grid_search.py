@@ -7,6 +7,7 @@ from agent.epsilon_greedy import EpsilonGreedyAgent
 from agent.thompson_sampling import TSAgent
 from agent.sarsa_agent import SARSAAgent
 from agent.ucb1_agent import UCB1Agent
+from agent.sarsa_ucb1_agent import SARSAUCB1Agent
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
@@ -69,8 +70,8 @@ def main(n_search, log_freq, plot_histogram=False):
     usage_path = f"/Volumes/Scratch/Users/ajphillips/gdm_streamed/{experiment}/estim" # TODO CHANGEME
     usage_path = f"./data/{experiment}/estim"
     # agent_list = ["RandomAgent", "EpsilonGreedyAgent", "DecayEpsilonGreedyAgent", 
-    #               "TSAgent", "SARSAAgent", "UCB1Agent"]
-    agent_list = ["SARSAAgent"]
+    #               "TSAgent", "SARSAAgent", "UCB1Agent", "SARSAUCB1Agent"]
+    agent_list = ["SARSAUCB1Agent"]
 
     # data: (dict, elecs, amps, elec_map, cell_ids, usage)
     data = load_dictionary(path, usage_path)
@@ -132,6 +133,13 @@ def main(n_search, log_freq, plot_histogram=False):
                 'lr': [0.1]
             }
             agent_class = UCB1Agent
+        elif agent_name == "SARSAUCB1Agent":
+            hyperparameter_ranges = {
+                'gamma': [0.9],
+                'c': [0.5, 1.0, 2.0, 4.0],
+                'lr': [0.1]
+            }
+            agent_class = SARSAUCB1Agent
         else:
             raise ValueError("Agent name not found")
         
@@ -169,4 +177,4 @@ def main(n_search, log_freq, plot_histogram=False):
     plt.show()
 
 if __name__ == "__main__":
-    main(n_search=500001, log_freq=50000)
+    main(n_search=250001, log_freq=50000)
