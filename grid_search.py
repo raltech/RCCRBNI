@@ -4,7 +4,6 @@ from utils.reward_func import inverse_reward_func, scatter_reward_function, dive
 from utils.score_func import span_score_func, scatter_matrix_score_func, qr_rank_score_func, RREF_score_func, relevance_score_func
 from utils.helper import load_dictionary, action2elec_amp
 from agent.epsilon_greedy import EpsilonGreedyAgent
-from agent.thompson_sampling import TSAgent
 from agent.sarsa_agent import SARSAAgent
 from agent.ucb1_agent import UCB1Agent
 from agent.sarsa_ucb1_agent import SARSAUCB1Agent

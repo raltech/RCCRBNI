@@ -4,13 +4,11 @@ from utils.reward_func import inverse_reward_func, diversity_reward_function, mo
 from utils.score_func import span_score_func, scatter_matrix_score_func, qr_rank_score_func, RREF_score_func, relevance_score_func
 from utils.helper import load_dictionary, action2elec_amp
 from agent.epsilon_greedy import EpsilonGreedyAgent
-from agent.thompson_sampling import TSAgent
 from agent.sarsa_agent import SARSAAgent
 from agent.ucb1_agent import UCB1Agent
 from agent.sarsa_ucb1_agent import SARSAUCB1Agent
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import time
 
 N_ELECTRODES = 512
 N_AMPLITUDES = 42
@@ -76,7 +74,6 @@ def main(n_search, log_freq, experiment, score_func, reward_func, n_avg_itr):
                 state = env.state
                 if i % log_freq == 0:
                     good_actions = np.nonzero(agent.Q[state])[0]
-                    # print(f"Number of good actions: {good_actions.shape}")
                     approx_dict = env.get_est_dictionary()[good_actions,:]
                     if len(approx_dict) == 0:
                         score_hist.append(0)
@@ -92,7 +89,6 @@ def main(n_search, log_freq, experiment, score_func, reward_func, n_avg_itr):
                 agent.update(state, action, reward, next_state)
 
             score_hist_list.append(score_hist)
-        # import pdb; pdb.set_trace()
         avg_score_hist_list.append(np.mean(score_hist_list, axis=0))
 
     # plot the span scores for each agent in the same plot
@@ -122,28 +118,26 @@ def main(n_search, log_freq, experiment, score_func, reward_func, n_avg_itr):
     ax.axvline(x=N_EXAUSTIVE_SEARCH/log_freq, color="black", linestyle="--")
     ax.axhline(y=baseline_score, color="black", linestyle="--")
     fig.savefig(f"./assets/scores/scores_{experiment}_{score_func.__name__}_{reward_func.__name__}_{n_search}_{n_avg_itr}.png", dpi=300)
-    # plt.show()
 
 if __name__ == "__main__":
     experiments = ["2022-11-04-2", "2022-11-28-1"]
-    # main(n_search=510001, log_freq=10000, experiment=experiments[0], score_func=relevance_score_func, reward_func=diversity_reward_function)
     n_search = 520001
     log_freq = 20000
-    n_avg_itr = 20
+    n_avg_itr = 2
     print("Experiment 1: {}_{}_{}".format(experiments[0], relevance_score_func.__name__, diversity_reward_function.__name__))
     main(n_search=n_search, log_freq=log_freq, experiment=experiments[0], score_func=relevance_score_func, reward_func=diversity_reward_function, n_avg_itr=n_avg_itr)
 
-    print("Experiment 2: {}_{}_{}".format(experiments[1], relevance_score_func.__name__, diversity_reward_function.__name__))
-    main(n_search=n_search, log_freq=log_freq, experiment=experiments[1], score_func=relevance_score_func, reward_func=diversity_reward_function, n_avg_itr=n_avg_itr)
+    # print("Experiment 2: {}_{}_{}".format(experiments[1], relevance_score_func.__name__, diversity_reward_function.__name__))
+    # main(n_search=n_search, log_freq=log_freq, experiment=experiments[1], score_func=relevance_score_func, reward_func=diversity_reward_function, n_avg_itr=n_avg_itr)
     
-    print("Experiment 3: {}_{}_{}".format(experiments[0], relevance_score_func.__name__, inverse_reward_func.__name__))
-    main(n_search=n_search, log_freq=log_freq, experiment=experiments[0], score_func=relevance_score_func, reward_func=inverse_reward_func, n_avg_itr=n_avg_itr)
+    # print("Experiment 3: {}_{}_{}".format(experiments[0], relevance_score_func.__name__, inverse_reward_func.__name__))
+    # main(n_search=n_search, log_freq=log_freq, experiment=experiments[0], score_func=relevance_score_func, reward_func=inverse_reward_func, n_avg_itr=n_avg_itr)
     
-    print("Experiment 4: {}_{}_{}".format(experiments[1], relevance_score_func.__name__, inverse_reward_func.__name__))
-    main(n_search=n_search, log_freq=log_freq, experiment=experiments[1], score_func=relevance_score_func, reward_func=inverse_reward_func, n_avg_itr=n_avg_itr)
+    # print("Experiment 4: {}_{}_{}".format(experiments[1], relevance_score_func.__name__, inverse_reward_func.__name__))
+    # main(n_search=n_search, log_freq=log_freq, experiment=experiments[1], score_func=relevance_score_func, reward_func=inverse_reward_func, n_avg_itr=n_avg_itr)
     
-    print("Experiment 5: {}_{}_{}".format(experiments[0], relevance_score_func.__name__, more_cell_reward_func.__name__))
-    main(n_search=n_search, log_freq=log_freq, experiment=experiments[0], score_func=relevance_score_func, reward_func=more_cell_reward_func, n_avg_itr=n_avg_itr)
+    # print("Experiment 5: {}_{}_{}".format(experiments[0], relevance_score_func.__name__, more_cell_reward_func.__name__))
+    # main(n_search=n_search, log_freq=log_freq, experiment=experiments[0], score_func=relevance_score_func, reward_func=more_cell_reward_func, n_avg_itr=n_avg_itr)
     
-    print("Experiment 6: {}_{}_{}".format(experiments[1], relevance_score_func.__name__, more_cell_reward_func.__name__))
-    main(n_search=n_search, log_freq=log_freq, experiment=experiments[1], score_func=relevance_score_func, reward_func=more_cell_reward_func, n_avg_itr=n_avg_itr)
+    # print("Experiment 6: {}_{}_{}".format(experiments[1], relevance_score_func.__name__, more_cell_reward_func.__name__))
+    # main(n_search=n_search, log_freq=log_freq, experiment=experiments[1], score_func=relevance_score_func, reward_func=more_cell_reward_func, n_avg_itr=n_avg_itr)
