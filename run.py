@@ -7,6 +7,7 @@ from agent.epsilon_greedy import EpsilonGreedyAgent
 from agent.thompson_sampling import TSAgent
 from agent.sarsa_agent import SARSAAgent
 from agent.ucb1_agent import UCB1Agent
+from agent.sarsa_ucb1_agent import SARSAUCB1Agent
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
@@ -15,16 +16,16 @@ N_ELECTRODES = 512
 N_AMPLITUDES = 42
 N_EXAUSTIVE_SEARCH = N_ELECTRODES * N_AMPLITUDES * 25
 
-def main(n_search, log_freq, plot_histogram=False):
+def main(n_search, log_freq):
     score_func = relevance_score_func
-    reward_func = inverse_reward_func
+    reward_func = diversity_reward_function
     experiments = ["2022-11-04-2", "2022-11-28-1"]
     experiment = experiments[0]
     path = f"./data/{experiment}/dictionary"
     usage_path = f"/Volumes/Scratch/Users/ajphillips/gdm_streamed/{experiment}/estim" # TODO CHANGEME
     usage_path = f"./data/{experiment}/estim"
     agent_list = ["RandomAgent", "EpsilonGreedyAgent", "DecayEpsilonGreedyAgent", 
-                  "SARSAAgent", "UCB1Agent"]
+                  "UCB1Agent", "SARSAAgent", "SARSAUCB1Agent"]
     # agent_list = ["UCB1Agent"]
 
     # data: (dict, elecs, amps, elec_map, cell_ids, usage)
@@ -37,7 +38,7 @@ def main(n_search, log_freq, plot_histogram=False):
     
     # average the scores for multiple runs
     avg_score_hist_list = []
-    n_avg_itr = 2
+    n_avg_itr = 10
     
     for agent_name in agent_list:
         print("\n========================================")
@@ -60,12 +61,12 @@ def main(n_search, log_freq, plot_histogram=False):
                 agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=0.6, decay_rate=1, lr=0.1)
             elif agent_name == "DecayEpsilonGreedyAgent":
                 agent = EpsilonGreedyAgent(env, gamma=0.9, epsilon=1.0, decay_rate=1-10e-6, lr=0.1)
-            elif agent_name == "TSAgent":
-                agent = TSAgent(env, gamma=0.9, lr=0.1)
             elif agent_name == "SARSAAgent":
                 agent = SARSAAgent(env, gamma=0.9, epsilon=0.4, lr=0.1)
             elif agent_name == "UCB1Agent":
                 agent = UCB1Agent(env, gamma=0.9, c=1.0, lr=0.1)
+            elif agent_name == "SARSAUCB1Agent":
+                agent = SARSAUCB1Agent(env, gamma=0.9, c=1.0, lr=0.1)
             else:
                 raise ValueError("Agent name not found")
             
@@ -93,38 +94,32 @@ def main(n_search, log_freq, plot_histogram=False):
 
     # plot the span scores for each agent in the same plot
     fig, ax = plt.subplots()
+    plt.rcParams.update({'font.size': 20})
     for i, agent_name in enumerate(agent_list):
-        ax.plot(avg_score_hist_list[i], label=agent_name)
-    ax.set_xlabel("Episode {0}k".format(log_freq/1000))
-    ax.set_ylabel("Score")
-    ax.set_title("Score")
-    ax.legend()
+        if agent_name == "RandomAgent":
+            ax.plot(avg_score_hist_list[i], label="QL,Random", linewidth=3)
+        elif agent_name == "EpsilonGreedyAgent":
+            ax.plot(avg_score_hist_list[i], label="QL,$\epsilon$-Greedy", linewidth=3)
+        elif agent_name == "DecayEpsilonGreedyAgent":
+            ax.plot(avg_score_hist_list[i], label="QL,Decaying-$\epsilon$-Greedy", linewidth=3)
+        elif agent_name == "UCB1Agent":
+            ax.plot(avg_score_hist_list[i], label="QL,UCB1", linewidth=3)
+        elif agent_name == "SARSAAgent":
+            ax.plot(avg_score_hist_list[i], label="SARSA,$\epsilon$-Greedy", linewidth=3)
+        elif agent_name == "SARSAUCB1Agent":
+            ax.plot(avg_score_hist_list[i], label="SARSA,UCB1", linewidth=3)
+        
+    ax.figure.set_size_inches(20, 15)
+    ax.set_xlabel("Episode {0}k".format(log_freq//1000), fontsize=28)
+    ax.set_ylabel("Score", fontsize=28)
+    ax.set_title(f"Scores of each agent on {experiment} with {reward_func.__name__}", fontsize=30)
+    ax.tick_params(axis='both', which='major', labelsize=25)
+    ax.legend(fontsize=25)
     ax.axvline(x=N_EXAUSTIVE_SEARCH/log_freq, color="black", linestyle="--")
     ax.axhline(y=baseline_score, color="black", linestyle="--")
-    fig.savefig(f"./assets/scores_{experiment}_{score_func.__name__}_{reward_func.__name__}_{n_search}_{n_avg_itr}.png")
+    fig.savefig(f"./assets/scores/scores_{experiment}_{score_func.__name__}_{reward_func.__name__}_{n_search}_{n_avg_itr}.png", dpi=300)
     plt.show()
 
-    if plot_histogram:
-        # plot the histogram
-        occurrences = agent.get_n()[0]
-        print("max: ", np.max(occurrences))
-
-        enable_bin = False
-        if enable_bin:
-            # Define the number of bins you want
-            n_bins = len(occurrences) // 5
-            # Create the histogram with bin
-            plt.hist(range(len(occurrences)), weights=occurrences, bins=n_bins)
-        else:
-            # Create the histogram
-            plt.bar(range(len(occurrences)), occurrences)
-
-        # Add labels and title
-        plt.xlabel('Action index')
-        plt.ylabel('Number of occurrences')
-        plt.title('Histogram of action occurrences')
-        plt.yscale('log')
-        plt.show()
-
 if __name__ == "__main__":
-    main(n_search=505001, log_freq=500)
+    main(n_search=505001, log_freq=10000)
+    # main(n_search=10001, log_freq=1000)
