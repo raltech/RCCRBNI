@@ -83,7 +83,7 @@ def main(n_search, log_freq, plot_histogram=False):
     
     # average the scores for multiple runs
     avg_score_hist_list = []
-    n_avg_itr = 3
+    n_avg_itr = 10
 
     for agent_name in agent_list:
         print("\n========================================")
